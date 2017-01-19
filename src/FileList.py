@@ -30,8 +30,8 @@ class FileList:
     def __init__(self, uris=None):
 
         self.purge()
-	if uris:
-	        self.add_list(uris)
+        if uris:
+            self.add_list(uris)
 
     # Aggiunge una lista di file
     def add_list(self, uris):
