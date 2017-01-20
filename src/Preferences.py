@@ -98,6 +98,13 @@ FILE_PATTERN = (
 )
 
 # Pattern per le sottodirectory
+# %a artist name
+# %d album title
+# %g genre
+# %n track number
+# %s disc number
+# %t track title
+# %y year of release
 SUBFOLDERS_PATH = [("Artist-Album", "%a-%d"),
 		("Artist - Album", "%a - %d"),
 		("Artist - [Year] Album", "%a - [%y] %d"),
@@ -116,6 +123,8 @@ SUBFOLDERS_PATH = [("Artist-Album", "%a-%d"),
 		("Artist/[Year] Artist - Album/CD", "%a/[%y] %a - %d/%s"),
 		("Album/CD", "%d/%s"),
 		("[Year] Album/CD", "[%y] %d/%s"),
+		("<artist>/<year>---<album>", "%a/%y---%d"),
+		("<artist>/<year>---<album>---<genre>", "%a/%y---%d---%g"),
 		]
 
 # Pattern per i nomi dei file
@@ -129,6 +138,7 @@ FILENAME_PATTERN = [("Alternate filename pattern", ""),
 		("Disc number.Track number - Title", "%s.%n - %t"),
 		("Disc number.Track number Title", "%s.%n %t"),
 		("Disc number.Track number. Title", "%s.%n. %t"),
+		("<track-number>---<track-title>", "%n---%t"),
 		]
 
 # Lista di percorsi dove trovare eseguibili
@@ -219,33 +229,44 @@ INFO_PATTERN = """<i>track <b>n</b>umber</i>  (%n)
 <i>part of <b>s</b>et/disc number</i>  (%s)"""
 
 # Funzione per i pattern
-def expand_title(pattern, artist=None, album=None, year=None, track_number=None, title=None, disc_number=None, disc_number_str=None):
+def expand_title(pattern, artist=None, album=None, year=None, track_number=None, title=None, disc_number=None, disc_number_str=None, genre=None):
 	if artist and len(artist) > 0:
 		pattern = re.compile("%a").sub(artist, pattern)
 	else:
 		pattern = re.compile("%a").sub("", pattern)
+		
 	if album and len(album) > 0:
 		pattern = re.compile("%d").sub(album, pattern)
 	else:
 		pattern = re.compile("%d").sub("", pattern)
+		
 	if year and len(str(year)) > 0:
 		pattern = re.compile("%y").sub(str(year), pattern)
 	else:
 		pattern = re.compile("%y").sub("", pattern)
+		
 	if track_number and len(str(track_number)) > 0:
 		pattern = re.compile("%n").sub(str("%(#)02d" %{"#": int(track_number)}), pattern)
 	else:
 		pattern = re.compile("%n").sub("", pattern)
+		
 	if title and len(title) > 0:
 		pattern = re.compile("%t").sub(title, pattern)
 	else:
 		pattern = re.compile("%t").sub("", pattern)
+		
 	if disc_number and len(str(disc_number)) > 0:
 		pattern = re.compile("%s").sub(str("%(#)1d" %{"#": int(disc_number)}), pattern)
 	elif disc_number_str:
 		pattern = re.compile("%s").sub("CD" + str("%(#)1d" %{"#": int(disc_number_str)}), pattern)
 	else:
 		pattern = re.compile("%s").sub("", pattern)
+		
+	if genre and len(genre) > 0:
+		pattern = re.compile("%g").sub(genre, pattern)
+	else:
+		pattern = re.compile("%g").sub("unknown", pattern)
+		
 	return pattern
 
 # Estensioni valide
