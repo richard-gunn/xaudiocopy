@@ -363,6 +363,21 @@ class PreferencesDialog:
 		else:
 			self.checkUnderscore.set_active(False)
 
+		# Convert to lower-case
+		hboxFileName5 = gtk.HBox()
+		hboxFileName5.set_homogeneous(False)
+		vboxFileName.pack_start(hboxFileName5, expand = False)
+		hboxFileName5.show()
+		self.checkLowerCase = gtk.CheckButton("Convert to lower-case", True)
+		hboxFileName5.pack_start(self.checkLowerCase, padding=20)
+		self.checkLowerCase.show()
+
+		# Retrieve the saved setting
+		if bool(int(self.prefs.get_option("convert-to-lower-case"))):
+			self.checkLowerCase.set_active(True)
+		else:
+			self.checkLowerCase.set_active(False)
+
 		# Cornice per gli ID tag
 		self.frameTag = gtk.Frame()
 		self.frameTag.set_shadow_type(gtk.SHADOW_NONE)
@@ -1336,6 +1351,11 @@ class PreferencesDialog:
 			self.prefs.set_option("replace-spaces-by-underscores", "1")
 		else:
 			self.prefs.set_option("replace-spaces-by-underscores", "0")
+		
+		if self.checkLowerCase.get_active():
+			self.prefs.set_option("convert-to-lower-case", "1")
+		else:
+			self.prefs.set_option("convert-to-lower-case", "0")
 		
 		if self.checkID3v1.get_active():
 			self.prefs.set_option("write-id3v1", "1")

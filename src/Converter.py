@@ -58,6 +58,21 @@ class Converter(threading.Thread):
 			self.listsongs = []
 			self.listsongs.append("#EXTM3U" + "\n")
 
+	def transformString(self, inString):
+
+		outString = inString
+
+		# Convert to lower-case
+		if bool(int(prefs.get_option("convert-to-lower-case"))):
+			outString = outString.lower()
+
+
+		# Sostituisce gli spazi con gli underscore
+		if bool(int(prefs.get_option("replace-spaces-by-underscores"))):
+			outString = re.compile(" ").sub("_", outString)
+
+		return outString
+
 	def run(self):
 
 		self.queue_complete = False
@@ -237,7 +252,7 @@ class Converter(threading.Thread):
 					self.playlistname = af.get_tag("artist") + " - " + af.get_tag("album")
 					self.listsongs.append("#EXTINF:" + str(int(af.get_duration())) + "," + af.get_tag("artist") + " - " + af.get_tag("title") + "\n")
 					self.listsongs.append(output_path[len(self.savepath + "/"):] + "\n")
-				
+
 				self.work_complete = True
 			else:
 				gobject.source_remove(self.idevent)
@@ -285,6 +300,8 @@ class Converter(threading.Thread):
 								disc_number_str=str(af.get_tag("disc_number")),
 								genre=af.get_tag("genre"))
 
+		save_path = transformString(save_path)
+
 		# Crea le sottodirectory se non esistono
 		if not os.path.exists(save_path):
 			save_path_split = save_path.split("/")
@@ -306,10 +323,8 @@ class Converter(threading.Thread):
 			for fnp in FILENAME_PATTERN:
 				if prefs.get_option("filename-pattern") == fnp[0]:
 					output_file_name = expand_title(fnp[1], af.get_tag("artist"), af.get_tag("album"), af.get_tag("year"), af.get_tag("track_number"), af.get_tag("title"), af.get_tag("disc_number"))
-		
-		# Sostituisce gli spazi con gli underscore
-		if bool(int(prefs.get_option("replace-spaces-by-underscores"))):
-			output_file_name = re.compile(" ").sub("_", output_file_name)
+
+		output_file_name = transformString(output_file_name)
 
 		print "###outputfilename###: ", output_file_name
 
@@ -507,7 +522,7 @@ class Converter(threading.Thread):
 						False, False]
 				else:
 					return False
-			
+
 
 	# Ricava la copertina per inserirla nei tag (se esiste nel file e se è installato il modulo PIL)
 	def Cover(self, audiofile):
