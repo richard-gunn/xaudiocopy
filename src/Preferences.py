@@ -285,6 +285,7 @@ FILENAME2TAG_PATTERN = [("Alternate filename pattern", ""),
 
 
 ### Classe che utilizza ConfigParser per scrivere/leggere il file con le preferenze ###
+### Class that uses ConfigParser to write/read the preferences file ###
 class Preferences:
 
 	def __init__(self, mainapp=None):
@@ -329,22 +330,23 @@ class Preferences:
 	
 		self.config_parser = ConfigParser.SafeConfigParser()
 
-		# Verifica se esiste la directory di config del programma nella home
-		# altrimenti la crea
+		# Verifica se esiste la directory di config del programma nella home altrimenti la crea
+		# Check to see if there is a config directory in the user's home directory - if not, create it
 		if not os.path.exists(XACHOME):
 			os.mkdir(XACHOME)
 		#	print "La direcotory", XACHOME, "è stata creata"
 		#else:
 		#	print "La direcotory", XACHOME, "esiste"
 
-		# Verifica se esiste il file di configurazione
-		# altrimenti lo crea e lo riempie con i valori di default
+		# Verifica se esiste il file di configurazione altrimenti lo crea e lo riempie con i valori di default
+		# Check to see if the config file exists in the directory - if not, create it with default settings
 		for dirpath, dirnames, filenames in os.walk(XACHOME):
 			# Verifica se esiste
 			if not XACCONFIG in filenames:
 				# Se non esiste apre un nuovo file vuoto
 				pref_file = open(XACCONFIGPATH, "w")
 				# Lo riempie con le opzioni di default
+				# Create options with default values
 				for section in self.default_prefs:
 					self.config_parser.add_section(section)
 					for option in self.default_prefs[section]:
@@ -356,8 +358,32 @@ class Preferences:
 				self.config_parser.write(pref_file)
 				# Chiude il file
 				pref_file.close()
-			#else:
-			#	print "Il file", XACCONFIGPATH, "esiste"
+			else:
+				# Examine existing config file for missing options
+				pref_file = open(XACCONFIGPATH, "r+")
+				self.config_parser.readfp(pref_file)
+
+				# Trigger for updating the config file
+				addNewOptions = False
+
+				for section in self.default_prefs:
+					for option in self.default_prefs[section]:
+						if not self.config_parser.has_option(section, option):
+							# Add missing open to config
+							addNewOptions = True
+							print 'Option not found', section, option
+							self.config_parser.set(
+								section,
+								option,
+								self.default_prefs[section][option])
+
+				if addNewOptions:
+					# Write updated config
+					print 'Adding new option(s) to config file...'
+					self.config_parser.write(pref_file)
+
+				pref_file.close()
+
 
 		# Carica le opzioni
 		self.config_parser.read(XACCONFIGPATH)
