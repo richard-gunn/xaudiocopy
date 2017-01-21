@@ -271,6 +271,7 @@ class Converter(threading.Thread):
 		prefs.set_option("last-save-folder", save_path)
 
 		# Aggiunge le sottodirectory se richiesto
+		# Adds subdirectories if required
 		if bool(int(prefs.get_option("create-subfolders"))):
 			for sfp in SUBFOLDERS_PATH:
 				if prefs.get_option("path-subfolder") == sfp[0]:
@@ -281,7 +282,8 @@ class Converter(threading.Thread):
 								str(af.get_tag("track_number")),
 								af.get_tag("title"),
 								"",
-								disc_number_str=str(af.get_tag("disc_number")))
+								disc_number_str=str(af.get_tag("disc_number")),
+								genre=af.get_tag("genre"))
 
 		# Crea le sottodirectory se non esistono
 		if not os.path.exists(save_path):
