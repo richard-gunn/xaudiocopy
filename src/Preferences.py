@@ -305,6 +305,7 @@ class Preferences:
 					"filename" : {"filename-pattern" : "Track number - Title",
 							"alternate-filename-pattern" : "n - t",
 							"replace-spaces-by-underscores" : "0",
+							"convert-to-lower-case" : "0",
 							"write-ID3v1" : "1",
 							"write-ID3v2" : "1",
 							"playlist" : "1"},
