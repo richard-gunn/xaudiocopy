@@ -221,12 +221,13 @@ FLAC_QUAL = [("Fastest", 0),
 RESAMPLE_VALUE = [11025, 22050, 44100, 48000, 72000, 96000, 128000]
 
 # Legenda per il pattern dei nomi dei file
-INFO_PATTERN = """<i>track <b>n</b>umber</i>  (%n)
+INFO_PATTERN = """<i>album/c<b>d</b> title</i>  (%d)
+<i><b>a</b>rtist name</i>  (%a)
+<i>cd di<b>s</b>c number</i>  (%s)
+<i><b>g</b>enre</i>  (%g)
+<i>track <b>n</b>umber</i>  (%n)
 <i>track <b>t</b>itle</i>  (%t)
-<i><b>a</b>rtist</i>  (%a)
-<i>album/<b>d</b>isc title</i>  (%d)
-<i><b>y</b>ear</i>  (%y)
-<i>part of <b>s</b>et/disc number</i>  (%s)"""
+<i><b>y</b>ear of release</i>  (%y)"""
 
 # Funzione per i pattern
 def expand_title(pattern, artist=None, album=None, year=None, track_number=None, title=None, disc_number=None, disc_number_str=None, genre=None):
@@ -304,7 +305,8 @@ class Preferences:
 							"path-subfolder" : "Artist/[Year] Artist - Album"},
 					"filename" : {"filename-pattern" : "Track number - Title",
 							"alternate-filename-pattern" : "n - t",
-							"replace-spaces-by-underscores" : "0",
+							"replace-spaces-with-char" : "0",
+							"replace-spaces-with-char-value" : "_",
 							"convert-to-lower-case" : "0",
 							"write-ID3v1" : "1",
 							"write-ID3v2" : "1",

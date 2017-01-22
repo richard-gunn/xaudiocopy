@@ -58,20 +58,20 @@ class Converter(threading.Thread):
 			self.listsongs = []
 			self.listsongs.append("#EXTM3U" + "\n")
 
-	def transformString(self, inString):
+	def transformString(self, in_string):
 
-		outString = inString
+		out_string = in_string
 
 		# Convert to lower-case
-		if bool(int(prefs.get_option("convert-to-lower-case"))):
-			outString = outString.lower()
+		if bool(int(self.prefs.get_option("convert-to-lower-case"))):
+			out_string = out_string.lower()
 
+		# Replace space with character
+		if bool(int(self.prefs.get_option("replace-spaces-with-char"))):
+			new_char = self.prefs.get_option("replace-spaces-with-char-value")
+			out_string = re.compile(" ").sub(new_char, out_string)
 
-		# Sostituisce gli spazi con gli underscore
-		if bool(int(prefs.get_option("replace-spaces-by-underscores"))):
-			outString = re.compile(" ").sub("_", outString)
-
-		return outString
+		return out_string
 
 	def run(self):
 
@@ -300,7 +300,7 @@ class Converter(threading.Thread):
 								disc_number_str=str(af.get_tag("disc_number")),
 								genre=af.get_tag("genre"))
 
-		save_path = transformString(save_path)
+		save_path = self.transformString(save_path)
 
 		# Crea le sottodirectory se non esistono
 		if not os.path.exists(save_path):
@@ -324,7 +324,7 @@ class Converter(threading.Thread):
 				if prefs.get_option("filename-pattern") == fnp[0]:
 					output_file_name = expand_title(fnp[1], af.get_tag("artist"), af.get_tag("album"), af.get_tag("year"), af.get_tag("track_number"), af.get_tag("title"), af.get_tag("disc_number"))
 
-		output_file_name = transformString(output_file_name)
+		output_file_name = self.transformString(output_file_name)
 
 		print "###outputfilename###: ", output_file_name
 

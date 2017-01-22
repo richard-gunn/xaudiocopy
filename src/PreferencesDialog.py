@@ -351,17 +351,24 @@ class PreferencesDialog:
 		hboxFileName4.set_homogeneous(False)
 		vboxFileName.pack_start(hboxFileName4, expand = False)
 		hboxFileName4.show()
-		self.checkUnderscore = gtk.CheckButton("Replace spaces by underscores", True)
-		#self.checkUnderscore.connect("toggled", self.on_underscores)
-		hboxFileName4.pack_start(self.checkUnderscore, padding=20)
-		self.checkUnderscore.show()
+		self.checkReplaceSpaces = gtk.CheckButton("Replace spaces with character", True)
+		self.checkReplaceSpaces.connect("toggled", self.on_replace_spaces)
+		hboxFileName4.pack_start(self.checkReplaceSpaces, expand=False, padding=20)
+		self.checkReplaceSpaces.show()
+		self.entryReplaceCharacter = gtk.Entry()
+		self.entryReplaceCharacter.set_width_chars(2)
+		self.entryReplaceCharacter.set_max_length(1)
+		self.entryReplaceCharacter.set_text(self.prefs.get_option("replace-spaces-with-char-value"))
+		hboxFileName4.pack_start(self.entryReplaceCharacter, expand=False, padding=0)
+		self.entryReplaceCharacter.show()
 
 		# Setta il check
-		if bool(int(self.prefs.get_option("replace-spaces-by-underscores"))):
-			self.checkUnderscore.set_active(True)
-			#self.on_underscores()
+		if bool(int(self.prefs.get_option("replace-spaces-with-char"))):
+			self.checkReplaceSpaces.set_active(True)
+			self.entryReplaceCharacter.set_sensitive(True)
 		else:
-			self.checkUnderscore.set_active(False)
+			self.checkReplaceSpaces.set_active(False)
+			self.entryReplaceCharacter.set_sensitive(False)
 
 		# Convert to lower-case
 		hboxFileName5 = gtk.HBox()
@@ -1171,6 +1178,13 @@ class PreferencesDialog:
 	def on_underscores(self, *args):
 		pass
 
+	def on_replace_spaces(self, *args):
+
+		if self.checkReplaceSpaces.get_active():
+			self.entryReplaceCharacter.set_sensitive(True)
+		elif not self.checkReplaceSpaces.get_active():
+			self.entryReplaceCharacter.set_sensitive(False)
+
 	def on_create_id3v1(self, *args):
 
 		if self.checkID3v1.get_active():
@@ -1346,11 +1360,18 @@ class PreferencesDialog:
 		self.prefs.set_option("path-subfolder", SUBFOLDERS_PATH[self.comboFolders.get_active()][0])
 		self.prefs.set_option("filename-pattern", FILENAME_PATTERN[self.comboFileName.get_active()][0])
 		self.prefs.set_option("alternate-filename-pattern", re.sub('%', '', self.entryFileName.get_text()))
-		
-		if self.checkUnderscore.get_active():
-			self.prefs.set_option("replace-spaces-by-underscores", "1")
+
+		if self.checkReplaceSpaces.get_active():
+			self.prefs.set_option("replace-spaces-with-char", "1")
 		else:
-			self.prefs.set_option("replace-spaces-by-underscores", "0")
+			self.prefs.set_option("replace-spaces-with-char", "0")
+
+		replacement_char = self.entryReplaceCharacter.get_text().strip()
+		
+		if replacement_char == "":
+			self.prefs.set_option("replace-spaces-with-char-value", "_")
+		else:
+			self.prefs.set_option("replace-spaces-with-char-value", replacement_char)
 		
 		if self.checkLowerCase.get_active():
 			self.prefs.set_option("convert-to-lower-case", "1")
